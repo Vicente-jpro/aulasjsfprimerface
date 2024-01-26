@@ -1,10 +1,16 @@
 package aulasjsfprimerface.config;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.SessionFactoryImplementor;
 
 public class HibernateConexao implements Serializable{
 
@@ -54,5 +60,31 @@ public class HibernateConexao implements Serializable{
 		}
 		return sessionFactory.openSession() ;
 	}
+	
+	/**
+	 * Obter a conexão do provedor de conexõesconfigurado
+	 * @return Connection SQL
+	 * @throws SQLException
+	 * */
+	public static Connection getConnectionProvider() throws SQLException{
+		return ((SessionFactoryImplementor) sessionFactory).getConnectionProvider().getConnection(); 
+		
+	}
+	
+	/**
+	 * @return Connection no InitalContext JAVA_COMP_ENV_JDBC_DATASOURSE
+	 * @throws Exception
+	 * */
 
+	public static Connection getConnection() throws Exception{
+		InitialContext context = new InitialContext();
+		DataSource ds = (DataSource) context.lookup( JAVA_COMP_ENV_JDBC_DATASOURSE );
+
+		if ( ds == null ) {
+		   throw new Exception("Data source not found!");
+		}
+		
+		return ds.getConnection();
+	}
+	
 }
